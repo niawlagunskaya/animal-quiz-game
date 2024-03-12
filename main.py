@@ -1,48 +1,113 @@
+import pygame
+pygame.init()
 
-class Question:
-    def __init__(self, question_text, answer_options, correct_answer):
-        self.text = question_text
-        self.correct_answer = correct_answer
-        self.answer_options = answer_options
-    
-    def display(self, question_number):
-        print(f"{question_number}. {self.text}")
-        for i, option in enumerate(self.answer_options, start=1):
-            print(f"   {i}. {option}")
-    
-    def check_answer(self, user_choice):
-        return int(user_choice)-1 == self.correct_answer
+screen_width = 700
+screen_height = 500
+PINK =  (222,93,131)
+WHITE = (255,255,255)
+ORANGE = (255,165,0)
+BLUE = (65,105,225)
+GREY = (169,169,169)
+box_width = 200
+box_height = 100
+font = pygame.font.Font(None, 32) 
+large_font = pygame.font.Font(None, 64)  # Larger font for final score
+small_font = pygame.font.Font(None, 30)   # Smaller font for button text
+question_index = 0
+score = 0
+boxes = []
 
-score=0
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("animal-quiz-game")
 
-quiz_questions = [
-    Question("What is the largest mammal?", ["Elephant", "Blue Whale", "Giraffe", "Hippo"], 1),
-    Question("Which animal is known as the 'King of the Jungle'?", ["Lion", "Tiger", "Leopard", "Elephant"], 0),
-    Question("What is the fastest land animal?", ["Gazelle", "Ostrich", "Cheetah", "Giraffe"], 2),
-    Question("What animal is the symbol of wisdom?", ["Eagle", "Owl", "Hawk", "Parrot"], 1),
-    Question("What animal is known for its long neck?", ["Giraffe", "Elephant", "Kangaroo", "Zebra"], 0),
-    Question("What is the only mammal capable of sustained flight?", ["Bat", "Bird", "Butterfly", "Bee"], 0),
-    Question("Which animal has the longest lifespan?", ["Tortoise", "Galapagos Giant Tortoise", "Bowhead Whale", "Parrot"], 2),
-    Question("What animal has the best sense of smell in the world?", ["Wolf", "Shark", "Elephant", "Bloodhound"], 3),
-    Question("What is the tallest animal on Earth?", ["Elephant", "Giraffe", "Kangaroo", "Horse"], 1),
-    Question("What animal is a natural swimmer and can hold its breath for up to 20 minutes?", ["Hippo", "Elephant", "Seal", "Penguin"], 0),
-    Question("What animal is known for rolling into a ball when threatened?", ["Armadillo", "Hedgehog", "Turtle", "Tortoise"], 0),
-    Question("What is the national animal of Australia?", ["Koala", "Platypus", "Emu", "Kangaroo"], 3),
-    Question("What animal has a hump on its back?", ["Horse", "Camel", "Cow", "Buffalo"], 1),
-    Question("What animal is often referred to as the 'Gentle Giant'?", ["Giraffe", "Horse", "Elephant", "Rhinoceros"], 2),
-    Question("What is the largest big cat in the world?", ["Tiger", "Lion", "Leopard", "Jaguar"], 0),
-    Question("What animal is capable of changing its color to blend in with its surroundings?", ["Octopus", "Cuttlefish", "Frog", "Chameleon"], 3),
-    Question("What animal is known for its black and white stripes?", ["Tiger", "Zebra", "Giraffe", "Leopard"], 1),
-    Question("What is the only continent where giraffes live in the wild?", ["North America", "South America", "Africa",  "Asia"], 2),
-    Question("What animal has the longest migration route of any mammal?", ["Arctic Tern", "Polar Bear", "Salmon", "Monarch Butterfly"], 0),
-    Question("What is the fastest marine animal?", ["Dolphin", "Shark", "Whale", "Sailfish"], 3)
-]
+running = True
+while running:
 
-for i, quiz in enumerate(quiz_questions, start=1):
-    quiz.display(i)
-    user_input = input("Your answer (enter the corresponding option number): ")
-    score += 10 if quiz.check_answer(user_input) else 0
-    print("Correct!\n" if quiz.check_answer(user_input) else f"Incorrect. The correct answer is: {quiz.answer_options[quiz.correct_answer]}\n")
+    class Question:
+        def __init__(self, text, answer_options, correct_answer):
+            self.text = text
+            self.correct_answer = correct_answer
+            self.answer_options = answer_options
+        
+        def check_answer(self, user_choice):
+            return int(user_choice) == int(self.correct_answer)
 
-print(f"Your score is {score}")
- 
+    for event in pygame.event.get():
+       if event.type == pygame.QUIT:
+           running = False
+       elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+           if question_index < len(quiz_questions):
+               for i, (box_surface, (x, y)) in enumerate(boxes):
+                   box_rect = pygame.Rect(x, y, box_width, box_height)
+                   if box_rect.collidepoint(event.pos):
+                       if quiz_questions[question_index].check_answer(i):
+                           score += 10
+                       question_index += 1
+                       break
+           else:
+               if 100 <= event.pos[0] <= 300 and 300 <= event.pos[1] <= 400:
+                   # Retake quiz button clicked
+                   question_index = 0
+                   score = 0
+               elif 400 <= event.pos[0] <= 600 and 300 <= event.pos[1] <= 400:
+                   # Quit button clicked
+                   running = False
+
+    screen.fill(WHITE)
+
+    quiz_questions = [
+        Question("Which farm animal says 'oink'?", ["Pig", "Cow", "Goat", "Duck"], 0),
+        Question("What farm animal is known for its milk?", ["Cow", "Pig", "Goat", "Duck"], 0),
+        Question("What animal is often used for riding?", ["Pig", "Cow", "Goat", "Horse"], 3),
+        Question("What farm animal lays eggs?", ["Chicken", "Sheep", "Horse", "Duck"], 0),
+        Question("Which animal is known for its wool?", ["Pig", "Cow", "Goat", "Sheep"], 3),
+        Question("What animal clucks and pecks?", ["Pig", "Cow", "Goat", "Chicken"], 3),
+        Question("What farm animal is often found in a pen?", ["Pig", "Cow", "Goat", "Duck"], 1),
+        Question("What animal neighs and gallops?", ["Pig", "Cow", "Goat", "Horse"], 3),
+        Question("What animal is known for its 'baa' sound?", ["Pig", "Cow", "Goat", "Sheep"], 3),
+        Question("What farm animal says 'quack'?", ["Pig", "Cow", "Goat", "Duck"], 3),
+    ]
+
+    if question_index < len(quiz_questions):
+        current_question = quiz_questions[question_index]
+        text = font.render(current_question.text, True, PINK)
+        text_rect = text.get_rect(center=(screen_width // 2, 75))
+        screen.blit(text, text_rect)
+        score_text = font.render(f"Points: {score}", True, PINK)
+        score_rect = score_text.get_rect(bottomright=(screen_width - 10, screen_height - 10))
+        screen.blit(score_text, score_rect)
+       
+
+        for i, option in enumerate(current_question.answer_options):
+            x =  80 + (i % 2) * (screen_width // 2.5) + 25
+            y = 150 + (i // 2) * (box_height + 50)
+            box_surface = pygame.Surface((box_width, box_height))
+            box_surface.fill(PINK)
+            box_text = font.render(option, True, WHITE)
+            text_rect = box_text.get_rect(center=(box_width // 2, box_height // 2))
+            box_surface.blit(box_text, text_rect)
+            boxes.append((box_surface, (x, y)))
+
+        for (box_surface, (x, y)) in boxes:
+            pygame.draw.rect(screen, WHITE, (x, y, box_width, box_height), 2)
+            screen.blit(box_surface, (x, y))
+    else:
+        final_score_text = large_font.render(f"Final Score: {score}", True, ORANGE)
+        final_score_rect = final_score_text.get_rect(center=(screen_width // 2, screen_height // 3))
+        screen.blit(final_score_text, final_score_rect)
+        
+        # Draw buttons
+        quit_button = pygame.Rect(400, 300, 200, 100)
+        retake_button = pygame.Rect(100, 300, 200, 100)
+        pygame.draw.rect(screen, GREY, quit_button)
+        pygame.draw.rect(screen, BLUE, retake_button)
+        retake_text = small_font.render("Retake Quiz", True, WHITE)
+        quit_text = small_font.render("Quit", True, WHITE)
+        retake_text_rect = retake_text.get_rect(center=retake_button.center)
+        quit_text_rect = quit_text.get_rect(center=quit_button.center)
+        screen.blit(quit_text, quit_text_rect)
+        screen.blit(retake_text, retake_text_rect)
+
+    pygame.display.flip()
+
+pygame.quit()
